@@ -1,0 +1,326 @@
+Docker Networking
+
+There are 3 network drivers are available at Docker
+
+1)	Bridge (Default and docker0)
+2)	None
+3)	Host
+
+Bridge
+
+Container get attached it
+
+Private internal network created by Docker and get ip address in the range of 172.17 series
+
+
+
+Overlay Network
+
+Docker Swarm
+
+docker network create --driver overlay --subnet 10.0.9.0/24 my-overlay-network
+
+Create an internal private network that spans across all the nodes
+
+Attach containers or services to this network using network option
+
+docker service create --replicas 2 --network my-overlay-network	nginx
+
+Ingress Network
+
+When executing Docker Swarm, automatically created Ingress Network
+
+It has build in a load balancer that redirect the traffic 
+
+
+_____________________________________________________________________________________________________
+Host
+
+Isolation between docker container and host
+Docker does not create any network
+It will use host network
+
+None
+
+Containers are not attached to any network and don't have any external network or other containers
+
+_______________________________________________________________________________________________________
+
+Lab :
+
+docker network ls
+
+ifconfig
+
+_______________________________________________________________________________________________________
+
+brctl show
+(If not installed, apply below comands for installing bridge utils
+apt-get install bridge-utils -y)
+
+Output is, there is no interfaces attached
+_______________________________________________________________________________________________________
+
+docker run -it --name c1 centos bash
+
+(Above command allow to create images, containers and directly get into container O/s)
+
+After apply above command, you can get into Container OS of Centos
+
+If you want exit from Container OS, you can apply CTRL pq button
+
+Objective of CTRL pq is you can exit from Container OS to Base OS without stopping of the container
+
+Apply, docker ps
+
+Indicating container is runnning
+
+_______________________________________________________________________________________________________
+
+Now, apply
+ifconfig
+You can get veth Configuration details
+
+This container add into our network, after apply below commands
+brctl show docker0
+
+Output is showing, Veth is attached to network
+
+You can get, interface details
+
+_______________________________________________________________________________________________________
+You apply below
+
+docker network inspect bridge
+
+You can get container details along with respective info
+
+_______________________________________________________________________________________________________
+
+Creating one more Container
+
+By applying below commands
+
+docker run -it --name c2 centos bash
+
+You can get into container os and applying CTRL pq for exit from container os
+
+docker ps
+You get newly created container
+
+Apply
+ifconfig
+brctl show
+Get two veth configuration details
+
+Veth is matching with number of container which you created
+
+These two container can communicate each other without specifying any network
+-------------------------------------------------------------------------------
+
+Time for proofing, whether one container communicate to other or not
+
+Apply below commands,
+
+docker network inspect bridge
+
+You can get now two interfaces, by using below
+
+brctl show docker0
+
+docker ps
+
+Get into container OS and ping to other container
+
+docker exec -it <container id> bash
+or
+docker attach <container name>
+
+Now, you are in conrainer os
+
+ping <IPV4Address>
+ping 172.17.0.2
+
+Now you get confirmation, one container can talk to other 
+
+Press CTL pq, exit unstopping container
+
+Another way of communicating
+
+docker attach <container name>
+Easiest way to get into container
+Now, you can apply ping
+
+_______________________________________________________________________________________________________
+
+How custom network connect with default network
+
+docker network ls
+
+docker network create myownnetwork --subnet=10.0.0.1/16 --gateway=10.0.10.100
+
+(You can change default subnet range 172.17 to 10.0 series)
+
+Subnet IP Range 16 is indicating that, it will allow to creat 16,532 ip's
+
+docker network ls
+(You can get newly created network)
+
+docker inspect <network name>
+
+Now, there is no container attached to it
+
+_______________________________________________________________________________________________________
+
+Create a new container that assign to newly created network
+
+docker run -it --net <network> --name c3.1 centos bash
+
+Exit from container OS, apply CTRL pq
+
+Now inspect again
+
+docker inspect <network name>
+
+Now, there is a container attached to it
+
+Next step is, two container wants to communicate
+
+My custome network container commnincate with default Bridge network container
+
+Test, newly created custom container would like to communicate with default Bridge network container
+
+[It won't work]
+
+Let's try now
+
+Get into newly created continer OS by applying
+
+docer ps
+docker exec -it <Container Id> bash
+
+[bash is for terminal name]
+
+At container os, apply
+ifconfig
+[if it did not work, install net tools at Centos as per below
+yum install net-tools]
+
+ifconfig
+
+At Container OS, 
+ping <Bridge network container>
+
+You cannot connect
+
+You can exit from Container OS, by apply CTRL pq
+
+Get into base os and apply
+ifconfig
+
+You get list of networks which you created
+
+brctl show
+
+For connect one network to other network
+----------------------------------------
+Below commands for container attached to network
+
+docker network connect <bridge> <Container Name>
+Bridge: Mention your network name
+
+docker exec -it <container id> bash
+
+or
+
+docker attach <container name>
+
+ping <Bridge Network ip address>
+Example: ping 172.17.0.2
+
+Now, you can get confirmation
+
+CUSTOM NETWORK COMMUNICATE WITH DEFAULT NETWORK
+_______________________________________________________________________________________________________
+
+Host Network
+
+Container attached to Host Network
+
+docker run -it --net=host --name myubuntu ubuntu:14.04 /bin/sh 
+
+(Now you are at Container OS and go to base OS by applying CTRL pq)
+docker network ls
+docker network inspect host
+You won't get Ip address for myubuntu container as we selected host network
+_______________________________________________________________________________________________________
+
+Another way to explore Docker Bridge Network
+
+
+Default : Container can communicate each other by ip address not by container name
+Custom: Container can communicate each other by ip address and by container name
+
+Creating couple of container by default bridge network
+
+
+docker run -it --name alpine1 alpine
+
+Exit, CTL pq
+
+Creating another container
+docker run -it --name alpine2 alpine
+Exit, CTL pq
+
+Get into Alpine1 Container and try to communicate to Alpine2 container
+docker attach <container name>
+
+ping <ip address of Alpine2 Container>
+You can get the output
+
+Try with container name
+ping <container name Alpine2>
+You get the error
+_______________________________________________________________________________________________________
+Creating custom network bridge
+
+docker network create --driver=bridge <name of the network>
+
+Example: docker network create --driver=bridge digicloud
+
+Creating a container which attached to newly created custom network
+
+docker run -it --name alpine3 --network=digicloud alpine
+Exit, CTL pq
+
+Ensure that newly created container attached with custom network
+
+docker network inspect <Network id or Network Name>
+
+Output indicating name of network, network type and container attached to it
+
+_______________________________________________________________________________________________________
+
+Creating new container
+
+docker run -it --name alpine4 --network=digicloud alpine
+Exit, CTL pq
+
+Get into a container
+
+docker attach <Container Name>
+
+Get into container and apply below
+
+ping <ip address>
+ping <container name>
+
+Both of above commands work and what we learned
+
+At Custom Bridge Network :
+Container can communicate each other by ip address and by container name
+_______________________________________________________________________________________________________
+
+How to obtain IP Address of Container
+
+docker inspect <Container Id> | grep "IPAddress"

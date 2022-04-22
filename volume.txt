@@ -1,0 +1,233 @@
+Docker Volume
+*************
+Data available even though container got deleted
+
+Why do we need to have docker volume?
+	
+	Data no longer available once container is stopped or removed
+	Docker container did not persist data permanently 
+
+Different types of Volume Mounts
+
+Volume Mount and Bind Mount
+***************************
+
+Containers are usually immutable and ephemeral
+
+Immuntable Infra: Only re-deploy container and never change
+
+This is the ideal scenario: What about DB or configuration related info
+
+Docker gives us features to ensure these "seperation of concerns"
+
+This is called "Persistent Data"
+
+Volume Mount
+************
+
+Volumes are created at Host File system and managed by Docker
+
+Make special location outside of the container
+
+At RHEL Linux or Ubuntu, volumes are located at /var/lib/docker/volumes/
+
+Volumes can be created by two way
+	1)	docker volume create
+	2)	Run time
+
+Volume can be mounted to multiple containers
+Volume can not be removed
+Volume can be removed by docker volume prune command
+
+Usage of the Volumes
+********************
+
+1)	Sharing data among various containers
+2)	When you want to backup, restore, or migrate data amoung multiple hosts
+
+Bind Mount
+**********
+
+Directory can be available anywhere in the Docker host system 
+Link container path to host path
+(Maps a host file or directory to a container file or directory)
+
+- Changes can be incorporated at host files and container files
+- There is a sync between host and container and vice versa
+*******************************************************************************************************
+
+Lab
+***
+
+Listing Docker volume
+******************
+
+docker volume ls
+
+Creating a Volume
+*****************
+docker volume create --name customerdb
+docker volume ls
+
+Use Case 1: Creating a container with volume and remove the container once you exit from the container
+******************************************************************************************************
+
+docker run -it --name suse1 --rm -v customerdb:/platniumcustomer centos
+
+- suse1 : Name of the container
+- -v: Volume
+- Platniumcustomer : Creating a folder at Container OS
+- --rm indicating that once you exit from container and automatically remove the container
+
+Output is
+
+You are getting into container OS and apply ls -la command
+
+You get one folder of "platniumcustomer"
+
+Apply command for Mount
+df -h
+which list out all mount details and you can get platniumcustomer
+
+Get into platniumcustomer folder and add few files under this folder
+
+After created files, apply below
+
+exit
+
+You are now Base os and exit from container os
+
+Since, you apply --rm commands container get deleted automatically
+
+You can get to know after apply below
+
+docker ps
+and 
+docker ps -a
+
+docker volume inspect customerdb
+
+You can get output of Json format and refer Mount Point Path
+
+Go to Mount Point path where you get the file which you created inside the container
+
+Lesson Learned: Even if you deleted container, data can be alive at base machine
+
+******************************************************************************************************
+
+Use Case 2: Creating a new container with same volume
+*****************************************************
+
+docker run -it --name suse2 --rm -v customerdb:/platniumcustomer1 centos
+
+Created automatically folder of platniumcustomer1 and file which you created earlier container 
+of suse1 
+
+Old container deleted, but container data stored in the Host machine volume
+
+Host machine volume bind with new container of suse2
+
+CREATING A VOLUME THAT PERSISTS WHEN THE CONTAINER GOT DELETED
+
+*******************************************************************************************************
+
+Use Case 3: Creating a volume dynamically (During run time)
+***********************************************************
+
+docker run -it --name suse3 -v customerdb1:/regularcustomer centos
+
+You are now at container os of centos
+
+Go to regularcustomer folder and create a new file
+
+After created the file, apply CTRL pq from the container
+
+(Now whatever data I captured here that persists to host machine too and if I remove the container,
+the same data persists to host machine)
+
+Now container alive now since we did not use --rm command
+
+*******************************************************************************************************
+
+Use Case 4: Container Data Persists after stop the container
+************************************************************
+
+Data can be alive, after stop the container
+
+Apply 
+
+docker stop <container name or id>
+
+Data can be persits, even after stop the container
+
+docker start <container name or id>
+
+Get into container OS as per below
+
+docker attach <Container id>
+
+or
+
+docker exec -it < Container id> bash
+
+Get into container os and you go respective foler where you can get respective files
+
+******************************************************************************************************
+
+Use Case 5: Creating Volume from an existing directory with data
+***************************************************************
+
+docker run -it --rm --name suse4 -v customerdb1:/var centos
+
+Get into container os and system created var directory automatically
+
+exit from container os
+*******************************************************************************************************
+
+Use Case 6: Linking data with other container
+*********************************************
+
+
+docker run -it --rm --name suse5 -v customerdb2:/linkcustomer centos ls linkcustomer
+
+Above command is for displaying ls commnad, that is going to display contents of the volume
+
+without get into bash termainals
+
+*******************************************************************************************************
+
+Use Case 7: Data sharing between containers
+*******************************************
+
+docker run -it --name suse6 -v customerdb3:/sharecustomer centos
+
+You are now at container os and get into sharecustomer folder
+
+At sharecustomer folder, you create a few files and save it
+
+Exit from container os
+
+Use Case 8 : Create suse7 container and mount volumes from suse6
+****************************************************************
+
+docker run -it --name suse7 --volumes-from suse6 centos
+
+Get into sharecustomer folder where you get the data
+
+******************************************************************************************************
+
+Use Case 9: Bind Volume
+***********************
+
+docker run -it --name suse8 -v /hostvolume/iosmobile:/containervolume/apple centos
+
+Now, you are in the container
+
+Get into containervolume/iosmobile directory and create few files
+
+After exit from the container, at host system you can get data which created at container
+
+At host system, edit the files (Whatever you edited which can be available at container too)
+
+You log into container and go to respective file and check it
+

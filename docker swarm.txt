@@ -1,0 +1,221 @@
+Docker Swarm for standalone
+
+Lab 1
+
+docker info (where swarm become inactive)
+
+Initialize the swarm
+
+docker swarm init (where swarm become active)
+
+docker info 
+
+Get Manager token, apply 
+
+docker swarm join-token manager
+
+Get Worker token, apply
+
+docker swarm join-token worker
+
+Listing and Inspecting nodes
+
+docker node ls
+
+docker node inspect self
+
+Creating an NGINX Service
+
+If you want a container part of cluster, we use for service
+
+docker service create --name web --publish 8080:80 nginx
+
+Go to browser and execute as per below, you get nginx home (Refer AWS instance public DNS or Public IP)
+Ex : ec2-54-85-53-67.compute-1.amazonaws.com:8080
+
+Service is a definition which allow to DB, webserver etc...
+
+Service lead to tasks
+
+docker service ls
+
+docker service ps web
+
+docker service rm web
+
+docker service ls
+
+Recreate service
+
+docker service create --name web --publish 8080:80 nginx
+
+docker service ls
+
+Tasks associate with service as per below
+
+docker service ps web
+
+Updating a services
+
+Adding more tasks
+
+docker service update --replicas=3 web
+
+docker service ps web
+
+For validating container, apply as per below
+
+docker ps
+
+Tasks are align with container
+
+for align with 3 container, apply below commands
+
+docker service update --replicas=3 web
+
+docker service ps web
+
+Time for deleting all containers
+
+Delete all container by single command
+docker rm -f $(docker ps -a -q)
+
+After apply above commands, try below commands
+
+docker ps
+
+You get all containers. It allows to delete but created new containers immediatekly
+
+Replicas is all about High Availability
+
+3 tasks are running
+
+Another way to update the replica is use scale option
+
+docker service scale web=4
+
+Now 4 tasks and 4 containers are running
+
+Delete Service
+
+docker service rm web
+
+************************************************************************************************************************
+Lab 2
+
+Adding nodes
+
+Move single node to multiple nodes
+
+docker node ls
+
+docker swarm leave --force
+Destroy the swarm
+
+docker ps
+docker ls
+
+Initialze your swarm, that node automtically becomes a manager node
+
+docker info | grep Swarm
+
+You result of Swaram : inactive
+
+Apply as per below
+
+docker swarm init 
+
+docker info | grep Swarm
+
+You result of Swaram : active
+
+Get Manager token, apply 
+
+docker swarm join-token manager
+
+Get Worker token, apply
+
+docker swarm join-token worker
+
+docker node ls
+
+Create a new worker node and install Docker
+
+apply worker token on the worker node
+
+Eg : 
+
+docker swarm join \
+    --token SWMTKN-1-4nszkv3lxl9oopmzyuxj2yivhawbylm1jh7fl0zpjwjre8c73t-5tuncnyov65knlf70tsethpb9 \
+    172.31.85.164:2377
+
+Creating a services
+
+Go to goole and search for docker hub manomarks/visualizer
+
+Visit https://github.com/dockersamples/docker-swarm-visualizer
+
+Copy below service statement into Leader node
+
+docker service create \
+  --name=viz \
+  --publish=8080:8080/tcp \
+  --constraint=node.role==manager \
+  --mount=type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock \
+  dockersamples/visualizer
+
+
+Ensure that newly created service is running by applying
+
+docker service ls
+docker service ps viz
+
+Go to ece2 console and copy leader node public DNS value at browser with : 8080
+
+Example
+
+http://ec2-34-201-45-243.compute-1.amazonaws.com:8080/
+
+You get visual images of all your nodes and all are indicating as Green
+
+Scale up
+
+docker service scale viz=2 (Refer Visualizer)
+docker service scale viz=8 (Refer Visualizer)
+
+Scale Down
+
+docker service scale viz=3
+
+_____________________________________________________________________________________
+
+Creating one more services as per below
+
+docker service create --name customer-api --publish 3000:3000 swarmgs/customer
+
+Go to Visualizer, new service has added now
+
+
+_____________________________________________________________________
+
+Scale up
+
+docker service scale customer-api=2 (Refer Visualizer)
+docker service scale customer-api=8 (Refer Visualizer)
+
+Scale Down
+
+docker service scale customer-api=3 (Refer Visualizer)
+__________________________________________________________________________
+
+
+Stop the worker node or stop the Docker (systemctl stop docker)
+Go to ec2 console and stop the worker node
+
+Now, your worker node has stopped and indicating as red
+
+Start the worker node
+
+Go to ec2 console and start the worker node
+
+Now, your worker node has started and indicating as Green

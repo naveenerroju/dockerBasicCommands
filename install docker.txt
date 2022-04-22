@@ -1,0 +1,208 @@
+Go to ec2 console and create ubuntu 18.04 instance
+
+Change to root user by applying sudo -i or sudo su
+
+apt-get update 
+wget -qo- https://get.docker.com/ | sh 
+apt install docker.io -y
+_______________________________________________________________________________________
+
+docker version
+docker --help
+docker info
+docker images
+(Image is a template for the environment that you want to run and when you run a image you get a container)
+
+Images:
+
+Images are package or template such as VM Template
+Images are used to create one or more containers
+Images are read only template used to create containers
+Images are stored in the Docker registry (Docker Hub)
+
+Display / list out Docker Container
+docker ps or (docker container ls)
+docker ps -a or (docker container ls -a)
+-a : indicating all containers such as active and in-active
+_______________________________________________________________________________________
+Create an account at Docker Hub
+_______________________________________________________________________________________
+
+docker search centos
+(Display images which are avilable at Docker Hub)
+
+docker search clock
+
+docker pull jpetazzo/clock
+(Download images from Docker Hub)
+
+Ensure jpetazzo/clock available or not, by applying below
+docker images
+
+Creating Container
+
+i -> input
+t -> terminal
+--name : Make your own name of a container
+
+Create a container with Attach Mode
+
+docker run -it --name ourclock jpetazzo/clock
+
+Ensure that Docker has created container or not
+docker ps or docker container ls
+docker pa -a or docker container ls -a
+
+Create a container with background (De-attached mode)
+
+docker run -d --name ourclock jpetazzo/clock
+-d -> Deattached mode
+You get the error as container exits on same name
+
+Option 1:
+
+Generate container with different name
+
+or
+
+Option 2:
+
+Delete the container
+
+docker rm < Container id >
+
+Docker logs
+
+docker logs < Container Id >
+
+Live Logs
+
+docker logs -f < Container Id >
+
+docker ps -l
+(Display latest container whether active or inactive)
+
+docker ps -q
+(Display only active container id)
+
+docker ps -aq
+(Display all active and inactive container id)
+
+docker system prune
+(Remove all stopped containers)
+
+docker rm < Container Id >
+(Deleting Container)
+
+Delete all container by single command
+docker rm -f $(docker ps -a -q)
+
+
+docker rmi < Image Id >
+(Deleting Image)
+
+Delete all images with single command
+docker rmi $(docker images -qa)
+___________________________________________________________________________________________
+
+Download images from Dockerhub
+
+Port Forwarding
+
+docker pull tutum/hello-world
+
+docker run -it -p 80:80 --name web tutum/hello-world
+
+-p is Port
+
+(Run on the background)
+
+Go to browse and check whether you get the output or not
+
+Example : http://ec2-54-161-80-134.compute-1.amazonaws.com/
+
+Try with 8082 Port Number
+
+docker run -it -p 8082:80 --name web2 tutum/hello-world
+
+Get into Container (VM) or how to login into Running Container
+
+docker run -d -p 8090:80 --name web3 tutum/hello-world
+
+Get into Container as per below commands
+
+docker exec -it < Container Id > /bin/sh
+
+or
+
+docker exec -it < Container Id > bash
+
+Get into Container O/S
+
+Apply below command 
+
+exit
+
+Get out from Container O/S or VM
+
+____________________________________________________________________________________________
+
+Download Ubuntu from Docker Hub
+
+docker pull ubuntu:14.04
+docker images
+docker run -it --name myubuntu ubuntu:14.04
+Now, you are in Container O/S or VM
+
+Apply below commands
+
+apt-get update
+apt-get install figlet
+git --version
+apt-get install git -y
+
+Apply
+git --version
+
+At Ubuntu VM or Container O/s, installed figlet and git
+
+How to come out from VM or Container O/s, by applying
+
+exit
+
+Please ensure that whether you created container or not
+
+docker ps -a or docker container ls -a
+
+
+Your Own Images (creating your image. This is called Build, customization of images)
+
+docker commit -m "Ubuntu Figlet" -a "Ram" <Container Id> <Your Image Name>
+-m indicates which message you want to supply
+-a indicates Author Name
+<Your Image Name> : Need to provide <Docker Hub Username>/<Your Image Name>:<Tag Name>
+
+Ensure that new custome image has created or not, by applying
+
+docker images
+
+Now, you can upload your custom images to Docker Hub
+
+docker login
+(Docker connect to Docker Hub)
+docker push <Docker Images>
+Go to Docker Hub Repoistory where you can get image which you uploaded
+__________________________________________________________________________________________________
+
+docker run -it --name myubuntu ubuntu:14.04
+if you apply Ctrl and C, container got stopped
+if you apply Ctrl pq, container won't stopped
+_________________________________________________________________________________
+
+Stop and Kill the Container
+
+docker stop < Container Id >
+Take few more seconds to stop the container
+
+docker kill < Container Id >
+Immediately kill the container

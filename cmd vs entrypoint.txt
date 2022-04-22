@@ -1,0 +1,92 @@
+Docker CMD Vs ENTRYPOINT
+
+CMD : You can override the arguments
+ENTRYPOINT : Not override the arguments but it appends
+
+Open Dockerfile with any editor
+
+Lab 1
+
+At Dockerfile
+
+FROM ubuntu:16.04
+CMD echo "Welcome to Docker"
+
+Execute as per below
+docker build -t app .
+
+After execution, docker generate built details which need to be copied
+
+docker run -it <<Images Id>>
+Example: docker run -it 66254af7baed
+
+Output:
+Welcome to Docker
+
+Lab 2
+
+We would like to override CMD parameter
+
+docker run -it 66254af7baed echo "Welcome to New Docker"
+
+Output
+
+Welcome to to New Docker
+
+Lab 3
+
+Use multiple CMD at Dockerfile 
+
+FROM ubuntu:16.04
+CMD echo "Welcome to Docker"
+CMD echo "Welcome to Devops Docker"
+
+Run as per below
+
+docker build -t app .
+
+Built
+docker run -it 66254af7baed
+
+Output
+Welcome to Devops Docker
+
+Dockerfile allows mulitple CMD however it activate last CMD commands
+
+_____________________________________________________________________________
+
+Lab 4 : For ENTRYPOINT
+
+Create a Dockerfile and add below commands
+
+FROM ubuntu:16.04
+ENTRYPOINT echo "Welcome to Docker"
+
+After saved Dockerfile, run as per below
+
+docker build -t app .
+
+After execution, docker generate built details which need to be copied
+
+docker run -it <<built details>>
+Example: docker run -it 66254af7baed
+
+Output:
+Welcome to Docker
+
+Lab 5
+
+Override
+
+docker run -it 66254af7baed echo "Hello, I am here"
+
+Output
+Welcome to Docker echo Hello, I am here
+
+ENTRYPOINT append the new values not replacing like CMD
+
+If you did not get desired outcome, need to change as per below
+
+FROM ubuntu:16.04
+ENTRYPOINT ["echo", "Welcome to Docker"]
+

@@ -1,0 +1,113 @@
+Docker Compose
+
+At Production, there are lot of containers are running
+
+Microservices are deployed at container
+
+Containers are seperate entity and interact with each other
+
+Technology Freedom
+
+For Example of Flipkart are having below modules 
+
+Offer Zone (Python)
+Baby & Kids (Go)
+
+If offer zone and Baby & Kids wants to interact each other via Json
+
+Docker Compose
+
+Tool to create multiple container and do configuration
+
+Exectution of Docker Compose by YAML
+
+_________________________________________________________________________________________
+
+Install Docker compose
+
+curl -L "https://github.com/docker/compose/releases/download/1.24.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+chmod +x /usr/local/bin/docker-compose
+
+docker-compose --version
+
+Create a directory
+
+Create a filename with extension
+docker-compose.yml or docker-compose.yaml
+
+Add below script at Yaml file
+
+version: '3'
+services:
+  web:
+    image: nginx
+  database:
+    image: redis
+
+docker-compose config (Validate syntax)
+docker-compose up -d
+-d L De-attached mode
+__________________________________________________________________________________________________________________________
+
+Adding Port Number
+
+version: '3'
+services:
+  web:
+    image: nginx
+    ports:
+    - 8095:80
+  database:
+    image: redis
+________________________________________________________________________________________________________________________
+Scale Up
+docker-compose up -d --scale database=3
+docker-compose ps
+Scale Down 
+docker-compose up -d --scale database=2
+docker-compose ps
+________________________________________________________________________________________
+Create new folder and execute below Yaml Script
+
+version: '3.3'
+
+services:
+   db:
+     image: mysql:5.7
+     volumes:
+       - db_data:/var/lib/mysql
+     restart: always
+     environment:
+       MYSQL_ROOT_PASSWORD: somewordpress
+       MYSQL_DATABASE: wordpress
+       MYSQL_USER: wordpress
+       MYSQL_PASSWORD: wordpress
+
+   wordpress:
+     depends_on:
+       - db
+     image: wordpress:latest
+     ports:
+       - "8000:80"
+     restart: always
+     environment:
+       WORDPRESS_DB_HOST: db:3306
+       WORDPRESS_DB_USER: wordpress
+       WORDPRESS_DB_PASSWORD: wordpress
+       WORDPRESS_DB_NAME: wordpress
+volumes:
+    db_data: {}
+
+______________________________________________________________________________________
+docker-compose up -d
+
+docker images
+(you get the output of wordpress and mysql images)
+
+Go to browser and apply public DNS value with port number
+
+Example: ec2-54-174-96-127.compute-1.amazonaws.com:8000
+
+You get Home page of WordPress
+
+
