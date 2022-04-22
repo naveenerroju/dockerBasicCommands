@@ -1,0 +1,65 @@
+kubectl get node
+kubectl get node -o wide
+
+Ensure that do you have any pod or not
+kubectl get pod
+
+Create a file for Pod definition
+Using editor either vi or nano
+vi <filename.yaml or filename.yml>
+nano <filename.yaml or filename.yml>
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mypod
+spec:
+  containers:
+  - name: nginx-container
+    image: nginx:1.7.9
+
+Apply 
+kubectl get pod
+kubectl get pod -o wide
+Run the Pod definition file
+kubectl apply -f <file name>
+kubectl get pod
+kubectl get pod -o wide
+kubectl describe pod <Pod Name>
+kubectl delete pod <Pod Name>
+________________________________________
+
+Create Name Space
+
+kubectl create ns <Name Space>
+
+Example: kubectl create ns test
+
+kubectl get ns
+
+Create a Pod in a given Namespace
+
+kubectl apply -f <Yaml File> --namespace <Name Space>
+
+Example: kubectl apply -f podlab.yaml --namespace=test
+
+List the Pods
+
+kubectl get pod
+
+List the Pods with additional detail
+
+kubectl get pod -o wide
+
+List the Pods in a given namespace
+
+kubectl get pod -n <name space>
+kubectl get pod -n test
+
+Describe the Pod
+
+kubectl describe pod mypod -n <NAME SPACE>
+
+Deleting 
+
+kubectl delete ns <NAME SPACE>

@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: nginx-rs
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx-keyword
+  template:
+    metadata:
+      labels:
+        app: nginx-keyword
+    spec:
+      containers:
+      - name: nginx-container
+        image: nginx
+
+************************************************************************************************************************
+kubectl get rs
+(rs => replicas set)
+kubectl apply -f <filename.yaml>
+kubectl get rs
+Get more details about Replica Set
+kubectl describe rs <Replica Set Name>
+kubectl get pod
+Delete all pod
+kubectl delete pod --all
+kubectl get pod
+Delete Replica Set
+kubectl delete rs <Replica Set Name>
+

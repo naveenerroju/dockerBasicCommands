@@ -1,0 +1,161 @@
+ETCD
+Etcd is a database that stores information in a key-value format
+
+ApiServer 
+
+The kube-apiserver is the primary management component of kubernetes. 
+The kube-api server is responsible for orchestrating all operations within the cluster.
+
+It exposes the Kubernetes API which is used by externals users to perform management operations on the cluster as well as the various controllers to monitor the state of the cluster and make the necessary changes as required and by the worker nodes to communicate with the server.
+___________________________________________________________________________________
+Create a new folder
+Get into new folder
+Create new file name with firstlab.yml and copy below Kubernetes definition files
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx-keyword
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: nginx-keyword
+  template:
+    metadata:
+      labels:
+        app: nginx-keyword
+    spec:
+      containers:
+      - name: nginx-container
+        image: nginx:1.7.9        
+___________________________________________________________________________________
+
+Create Deployment
+
+kubectl apply -f <FILE NAME>
+kubectl get deploy
+
+kubectl get deploy -o wide
+
+kubectl get pod
+
+kubectl get pod -o wide
+[Know the ip address of the POD and which node this POD is running]
+
+Get into Pod
+
+
+
+kubectl exec -it <POD NAME> /bin/sh # Getting into running container
+
+or
+
+kubectl exec -it <POD NAME> bash
+
+
+You can get into inside the POD
+
+Apply below commands
+
+ping < POD ip address>
+
+hostname
+
+output is
+
+nginx-deployment
+
+how to come out from pod, apply below
+
+exit
+
+kubectl get rs
+rs meanes Replica Sets
+
+kubectl describe deploy <DEPLOYMENT NAME>
+
+_________________________________________________________________________________________
+
+Upgrade Deployment
+
+Open Kubernetes definition file
+
+Replace nginx verson 1.7.9 with 1.9.1
+
+kubectl apply -f firstlab.yml
+
+kubectl get rs -w
+(-w : watch)
+
+(rs indicate replica set and w indicate watch)
+
+kubectl get rs
+(All POD's running under Replica Set)
+
+kubectl get deploy
+
+kubectl describe deploy nginx-deployment 
+
+_____________________________________________________________________________________
+
+Rollback Deployment
+
+kubectl rollout status deploy/nginx-deployment 
+(Be ready : nginx-deployment Rolling back)
+
+kubectl get deploy
+
+kubectl rollout history deploy/nginx-deployment
+
+[ You can get list of revision]
+
+kubectl rollout undo deploy/nginx-deployment
+
+1.9.1 replace with 1.7.9
+
+kubectl describe deploy nginx-deployment
+
+Checking K8S Pods CPU and Memory
+
+kubectl top pod <POD NAME> --namespace=default
+
+_______________________________________________________________________________________
+
+Scale up (Scaling)
+
+kubectl scale deploy nginx-deployment --replicas=6
+
+kubectl get deploy
+
+Auto Scale
+HPA : Horizontal Pod Auto scaling
+VPA: Vertical Pod Auto Scaling
+
+kubectl autoscale deploy nginx-deployment --min=5 --max=9 --cpu-percent=80
+
+kubectl get pods
+
+kubectl get hpa
+
+kubectl describe hpa nginx-deployment
+
+kubectl delete hpa nginx-deployment
+_______________________________________________________________________________________
+
+Pause a Deployment
+
+kubectl rollout pause deployment/nginx-deployment
+
+kubectl set image deploy/nginx-deployment nginx-container=nginx:1.9.1
+(Imperative way)
+
+kubectl rollout resume deployment/nginx-deployment
+
+kubectl describe deployment nginx-deployment
+
+Delete Deployment
+kubectl delete deploy <DEPLOYMENT NAME>
+		 

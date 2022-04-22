@@ -1,0 +1,24 @@
+kubectl | head      //Explains whats is Kubernate
+which kubectl       //provides the location of kubernate directory
+kubectl version     //provides the versions of all the resources (git, go, minor)
+kubectl version --short     //provides the version of the kubernate in short
+kubectl | more
+kubectl api-resources       //gives us all the available api list
+kubectl cluster-info        //returns all the running cluster links
+kubectl get cs          //gets all the ComponentStatuss
+(Components of Control Plane and get to know status of health)
+kubectl get nodes       //available running nodes
+kubectl api-versions        //returns api versions, but it doesnt specify the apis
+kubectl get pods -n kube-system     //returns the available pods and their statuses
+kubectl get all     //we can list down all the pods, services, statefulsets, etc
+kubectl get all -o wide
+kubectl get events      //Event is a report of an event somewhere in the cluster. Events have a limited retention time and triggers and messages may evolve with time
+kubectl explain pod     //explain command will explain the particular keyword
+kubectl explain rs      //ReplicaSet ensures that a specified number of pod replicas are running at any given time.
+kubectl explain deploy      //Deployment enables declarative updates for Pods and ReplicaSets.
+(Above commands obtain version of apiVersion)
+kubectl explain pod.spec.containers --recursive  |more
+
+Delete all objects by using single command
+
+kubectl delete all --all
